@@ -1,6 +1,6 @@
-import Total from './Total';
-import Header from './Header';
-import Content from './Content';
+import Total from './Total'
+import Header from './Header'
+import Content from './Content'
 
 const Course = ({ courses }) => {
     return (
@@ -13,7 +13,7 @@ const Course = ({ courses }) => {
                 </div>
             ))}
         </>
-    );
-};
+    )
+}
 
-export default Course;
+export default Course

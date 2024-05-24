@@ -1,4 +1,4 @@
-const Part = ({part, exercise}) => {
+const Part = ({ part, exercise }) => {
     return (
         <p>
             {part} {exercise}
@@ -6,4 +6,4 @@ const Part = ({part, exercise}) => {
     )
 }
 
-export default Part;
+export default Part
