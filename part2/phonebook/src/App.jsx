@@ -1,49 +1,75 @@
+import Filter from './components/Filter'
 import Persons from './components/Persons'
-
-import { useState } from 'react'
 import PersonsForm from './components/PersonsForm'
 
+import { useState } from 'react'
+
 const App = () => {
-    const [newNumber, setNewNumber] = useState('')
-    const [newName, setNewName] = useState('')
-    const [persons, setPersons] = useState([
-        { name: 'Arto Hellas', number: '555-555' },
-    ])
+    const [filterPersons, setFilterPersons] = useState([])
+    const [personInfo, setPersonInfo] = useState({
+        name: '',
+        number: '',
+    })
+    const [persons, setPersons] = useState([])
+    const [name, setName] = useState('')
 
     const handleName = (e) => {
-        setNewName(e.target.value)
+        setPersonInfo({
+            ...personInfo,
+            name: e.target.value,
+        })
     }
 
     const handleNumber = (e) => {
-        setNewNumber(e.target.value)
+        setPersonInfo({
+            ...personInfo,
+            number: e.target.value,
+        })
     }
 
     const handleSubmitInfo = (e) => {
         e.preventDefault()
-        if (newName.trim() !== '' && newNumber.trim() !== '') {
-            const newObject = { name: newName, number: newNumber }
+        if (personInfo.name.trim() !== '' && personInfo.number.trim() !== '') {
+            const newObject = {
+                name: personInfo.name,
+                number: personInfo.number,
+            }
 
             if (
-                persons.find((person) => person.name === newName) !== undefined
+                persons.find((person) => person.name === personInfo.name) !==
+                undefined
             ) {
-                alert(`${newName} is already added to phonebook`)
+                alert(`${personInfo.name} is already added to phonebook`)
             } else {
                 setPersons(persons.concat(newObject))
             }
         }
     }
 
+    const handleFilterPerson = (e) => {
+        const newObject = persons.filter((person) => {
+            if (
+                person.name.toLowerCase().includes(e.target.value.toLowerCase())
+            ) {
+                return person
+            }
+        })
+        setFilterPersons(newObject)
+        setName(e.target.value)
+    }
+
     return (
         <div>
             <h2>Phonebook</h2>
-            <h2>add new</h2>
+            <Filter onHandleFilterPerson={handleFilterPerson} />
+            <h2>Add new</h2>
             <PersonsForm
                 onHandleName={handleName}
                 onHandleNumber={handleNumber}
                 onHandleSubmitInfo={handleSubmitInfo}
             />
             <h3>Numbers</h3>
-            <Persons persons={persons} />
+            <Persons persons={name != '' ? filterPersons : persons} />
         </div>
     )
 }
