@@ -2,7 +2,11 @@ import Filter from './components/Filter'
 import Persons from './components/Persons'
 import PersonsForm from './components/PersonsForm'
 
-import { useState } from 'react'
+import axios from 'axios'
+
+import { useState, useEffect } from 'react'
+
+import setPerson from './services/persons'
 
 const App = () => {
     const [filterPersons, setFilterPersons] = useState([])
@@ -12,6 +16,16 @@ const App = () => {
     })
     const [persons, setPersons] = useState([])
     const [name, setName] = useState('')
+
+    useEffect(() => {
+        setPerson.getAll()
+            .then(data => {
+                setPersons(persons.concat(data))
+            })
+            .catch(error => {
+                console.log(error)
+            })
+    }, [])
 
     const handleName = (e) => {
         setPersonInfo({
@@ -41,7 +55,10 @@ const App = () => {
             ) {
                 alert(`${personInfo.name} is already added to phonebook`)
             } else {
-                setPersons(persons.concat(newObject))
+                setPerson.create(newObject)
+                    .then(data => {
+                        setPersons(persons.concat(data))
+                    })
             }
         }
     }
@@ -58,6 +75,15 @@ const App = () => {
         setName(e.target.value)
     }
 
+    const handleDeletePerson = (person) => {
+        if (window.confirm(`Delete ${person.name} ?`)) {
+            setPerson.remove(person)
+                .then(data => {
+                    setPersons(persons.filter(p => p.id != data.id))
+                })
+        }
+    }
+
     return (
         <div>
             <h2>Phonebook</h2>
@@ -69,7 +95,7 @@ const App = () => {
                 onHandleSubmitInfo={handleSubmitInfo}
             />
             <h3>Numbers</h3>
-            <Persons persons={name != '' ? filterPersons : persons} />
+            <Persons persons={name != '' ? filterPersons : persons} onDeletePerson={handleDeletePerson} />
         </div>
     )
 }
