@@ -1,6 +1,7 @@
 import Filter from './components/Filter'
 import Persons from './components/Persons'
 import PersonsForm from './components/PersonsForm'
+import Notification from './components/Notification'
 
 import { useState, useEffect } from 'react'
 
@@ -14,6 +15,8 @@ const App = () => {
     })
     const [persons, setPersons] = useState([])
     const [name, setName] = useState('')
+    const [notificationMessage, setNotificationMessage] = useState(null)
+    const [error, setError] = useState(false)
 
     useEffect(() => {
         setPerson.getAll()
@@ -64,6 +67,11 @@ const App = () => {
                         })
                 }
             } else {
+                setError(false)
+                setNotificationMessage(`Added ${personInfo.name}`)
+                setTimeout(() => {
+                    setNotificationMessage(null)
+                }, 4000)
                 setPerson.create(newObject)
                     .then(data => {
                         setPersons(persons.concat(data))
@@ -90,12 +98,20 @@ const App = () => {
                 .then(data => {
                     setPersons(persons.filter(p => p.id != data.id))
                 })
+                .catch(error => {
+                    setError(true)
+                    setNotificationMessage(`Information of ${person.name} has already been removed from server`)
+                    setTimeout(() => {
+                        setNotificationMessage(null)
+                    }, 4000)
+                })
         }
     }
 
     return (
         <div>
             <h2>Phonebook</h2>
+            <Notification message={notificationMessage} error={error} />
             <Filter onHandleFilterPerson={handleFilterPerson} />
             <h2>Add new</h2>
             <PersonsForm
