@@ -2,8 +2,6 @@ import Filter from './components/Filter'
 import Persons from './components/Persons'
 import PersonsForm from './components/PersonsForm'
 
-import axios from 'axios'
-
 import { useState, useEffect } from 'react'
 
 import setPerson from './services/persons'
@@ -49,11 +47,22 @@ const App = () => {
                 number: personInfo.number,
             }
 
+            const existPerson = persons.find((person) => person.name === personInfo.name)
+
             if (
-                persons.find((person) => person.name === personInfo.name) !==
-                undefined
+                existPerson !== undefined
             ) {
-                alert(`${personInfo.name} is already added to phonebook`)
+                if (window.confirm(`${personInfo.name} is already added to phonebook, replace the old number with a new one?`)) {
+                    setPerson.update(newObject, existPerson.id)
+                        .then(data => {
+                            setPersons(persons.map(p => {
+                                if (p.id == data.id) {
+                                    return data
+                                }
+                                return p
+                            }))
+                        })
+                }
             } else {
                 setPerson.create(newObject)
                     .then(data => {
