@@ -1,8 +1,11 @@
 import Filter from './components/Filter'
 import Persons from './components/Persons'
 import PersonsForm from './components/PersonsForm'
+import Notification from './components/Notification'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+
+import setPerson from './services/persons'
 
 const App = () => {
     const [filterPersons, setFilterPersons] = useState([])
@@ -12,6 +15,18 @@ const App = () => {
     })
     const [persons, setPersons] = useState([])
     const [name, setName] = useState('')
+    const [notificationMessage, setNotificationMessage] = useState(null)
+    const [error, setError] = useState(false)
+
+    useEffect(() => {
+        setPerson.getAll()
+            .then(data => {
+                setPersons(persons.concat(data))
+            })
+            .catch(error => {
+                console.log(error)
+            })
+    }, [])
 
     const handleName = (e) => {
         setPersonInfo({
@@ -35,13 +50,32 @@ const App = () => {
                 number: personInfo.number,
             }
 
+            const existPerson = persons.find((person) => person.name === personInfo.name)
+
             if (
-                persons.find((person) => person.name === personInfo.name) !==
-                undefined
+                existPerson !== undefined
             ) {
-                alert(`${personInfo.name} is already added to phonebook`)
+                if (window.confirm(`${personInfo.name} is already added to phonebook, replace the old number with a new one?`)) {
+                    setPerson.update(newObject, existPerson.id)
+                        .then(data => {
+                            setPersons(persons.map(p => {
+                                if (p.id == data.id) {
+                                    return data
+                                }
+                                return p
+                            }))
+                        })
+                }
             } else {
-                setPersons(persons.concat(newObject))
+                setError(false)
+                setNotificationMessage(`Added ${personInfo.name}`)
+                setTimeout(() => {
+                    setNotificationMessage(null)
+                }, 4000)
+                setPerson.create(newObject)
+                    .then(data => {
+                        setPersons(persons.concat(data))
+                    })
             }
         }
     }
@@ -58,9 +92,26 @@ const App = () => {
         setName(e.target.value)
     }
 
+    const handleDeletePerson = (person) => {
+        if (window.confirm(`Delete ${person.name} ?`)) {
+            setPerson.remove(person)
+                .then(data => {
+                    setPersons(persons.filter(p => p.id != data.id))
+                })
+                .catch(error => {
+                    setError(true)
+                    setNotificationMessage(`Information of ${person.name} has already been removed from server`)
+                    setTimeout(() => {
+                        setNotificationMessage(null)
+                    }, 4000)
+                })
+        }
+    }
+
     return (
         <div>
             <h2>Phonebook</h2>
+            <Notification message={notificationMessage} error={error} />
             <Filter onHandleFilterPerson={handleFilterPerson} />
             <h2>Add new</h2>
             <PersonsForm
@@ -69,7 +120,7 @@ const App = () => {
                 onHandleSubmitInfo={handleSubmitInfo}
             />
             <h3>Numbers</h3>
-            <Persons persons={name != '' ? filterPersons : persons} />
+            <Persons persons={name != '' ? filterPersons : persons} onDeletePerson={handleDeletePerson} />
         </div>
     )
 }
