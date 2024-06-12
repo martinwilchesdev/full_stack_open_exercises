@@ -1,6 +1,8 @@
 const express = require('express')
 const app = express()
 
+app.use(express.json())
+
 let persons = [
     {
         "id": 1,
@@ -48,11 +50,23 @@ app.get('/api/persons/:id', (req, res) => {
     }
 })
 
+// eliminar un recurso individual
 app.delete('/api/persons/:id', (req, res) => {
     const request_id = Number(req.params.id)
     persons = persons.filter(person => person.id !== request_id)
 
     res.status(204).end()
+})
+
+// crear un nuevo recurso
+app.post('/api/notes', (req, res) => {
+    const body = req.body
+    const id = Math.max(...persons.map(person => person.id))
+
+    body.id = id + 1
+    persons = persons.concat(body)
+    
+    res.status(201).end()
 })
 
 const PORT = 3001
