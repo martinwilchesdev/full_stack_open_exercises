@@ -1,7 +1,6 @@
 const express = require('express')
+const morgan = require('morgan')
 const app = express()
-
-app.use(express.json())
 
 let persons = [
     {
@@ -25,6 +24,12 @@ let persons = [
         "number": "39-23-6423122"
     }
 ]
+
+app.use(express.json())
+
+// logger morgan personalizado
+morgan.token('body', (req, res) => JSON.stringify(req.body))
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
 // obtener todos los recursos
 app.get('/api/persons', (req, res) => {
@@ -65,8 +70,9 @@ app.post('/api/notes', (req, res) => {
 
     body.id = id + 1
     persons = persons.concat(body)
-    
+
     res.status(201).end()
+    // morgan.token('tiny', function (req, res) { return req.headers['content-type'] })
 })
 
 const PORT = 3001
