@@ -61,8 +61,8 @@ app.delete('/api/persons/:id', (req, res) => {
 // crear un nuevo recurso
 app.post('/api/persons', (req, res) => {
     const body = req.body
-    if (!body.name) return res.status(400).json({ error: 'field name cannot be empty' })
-    if (persons.find(person => person.name === body.name)) return res.status(400).json({ error: 'name must be unique' })
+    if (!body.name) return res.status(400).send({ error: 'field name cannot be empty' })
+    if (persons.find(person => person.name === body.name)) return res.status(400).send({ error: 'name must be unique' })
 
     body.id = persons.length > 0 ? Math.max(...persons.map(person => person.id)) + 1 : 1
     persons = persons.concat(body)
