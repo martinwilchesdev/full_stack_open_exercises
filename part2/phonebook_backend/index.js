@@ -73,7 +73,6 @@ app.post('/api/persons', (req, res) => {
     persons = persons.concat(body)
 
     res.status(201).end()
-    // morgan.token('tiny', function (req, res) { return req.headers['content-type'] })
 })
 
 const PORT = 3001
