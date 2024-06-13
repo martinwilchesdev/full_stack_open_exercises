@@ -59,13 +59,14 @@ app.delete('/api/persons/:id', (req, res) => {
 })
 
 // crear un nuevo recurso
-app.post('/api/notes', (req, res) => {
+app.post('/api/persons', (req, res) => {
     const body = req.body
-    const id = Math.max(...persons.map(person => person.id))
+    if (!body.name) return res.status(400).json({ error: 'field name cannot be empty' })
+    if (persons.find(person => person.name === body.name)) return res.status(400).json({ error: 'name must be unique' })
 
-    body.id = id + 1
+    body.id = persons.length > 0 ? Math.max(...persons.map(person => person.id)) + 1 : 1
     persons = persons.concat(body)
-    
+
     res.status(201).end()
 })
 
