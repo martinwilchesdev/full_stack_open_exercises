@@ -1,4 +1,6 @@
 const CountryInfo = ({ country }) => {
+    console.log(country)
+
     const languages = []
 
     for (const lang in country.languages) {
@@ -19,6 +21,7 @@ const CountryInfo = ({ country }) => {
                 }
             </ul>
             <img src={country.flags.png} alt={country.flags.alt} />
+            {/* <h3>Weather in {country.capital}</h3> */}
         </div>
     )
 }
