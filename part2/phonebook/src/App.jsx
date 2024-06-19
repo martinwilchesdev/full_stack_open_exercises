@@ -21,7 +21,6 @@ const App = () => {
     useEffect(() => {
         setPerson.getAll()
             .then(data => {
-                console.log(data)
                 setPersons(persons.concat(data))
             })
             .catch(error => {

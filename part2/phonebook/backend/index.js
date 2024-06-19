@@ -2,11 +2,6 @@ const express = require('express')
 const cors = require('cors')
 const app = express()
 
-app.use(cors())
-
-app.use(express.json())
-app.use(express.static('dist'))
-
 let persons = [
     {
         "id": 1,
@@ -29,6 +24,11 @@ let persons = [
         "number": "39-23-6423122"
     }
 ]
+
+app.use(express.json())
+app.use(cors())
+
+app.use(express.static('dist'))
 
 // obtener todos los recursos
 app.get('/api/persons', (req, res) => {
