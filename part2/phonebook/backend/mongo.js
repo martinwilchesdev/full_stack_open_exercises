@@ -33,7 +33,7 @@ if (process.argv.length === 3) {
         })
 } else {
     const name = process.argv[3]
-    const number = process[4]
+    const number = process.argv[4]
 
     const person = new Person({ name, number })
 
