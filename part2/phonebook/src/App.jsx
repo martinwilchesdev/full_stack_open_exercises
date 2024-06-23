@@ -21,7 +21,7 @@ const App = () => {
     useEffect(() => {
         setPerson.getAll()
             .then(data => {
-                setPersons(persons.concat(data))
+                setPersons(data)
             })
             .catch(error => {
                 console.log(error)
@@ -75,6 +75,7 @@ const App = () => {
                 setPerson.create(newObject)
                     .then(data => {
                         setPersons(persons.concat(data))
+                        console.log(persons)
                     })
             }
         }
