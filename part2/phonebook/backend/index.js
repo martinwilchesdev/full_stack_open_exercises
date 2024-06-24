@@ -48,16 +48,8 @@ app.get('/api/persons/:id', (req, res, next) => {
         })
 })
 
-// eliminar un recurso individual
-app.delete('/api/persons/:id', (req, res) => {
-    const request_id = Number(req.params.id)
-    persons = persons.filter(person => person.id !== request_id)
-
-    res.status(204).end()
-})
-
 // crear un nuevo recurso
-app.post('/api/persons', (req, res) => {
+app.post('/api/persons', (req, res, next) => {
     const body = req.body
     if (!body.name) return res.status(400).send({ error: 'field name cannot be empty' })
     Person.find({ name: body.name })
@@ -78,6 +70,38 @@ app.post('/api/persons', (req, res) => {
         })
 })
 
+// actualizar un recurso existente
+app.put('/api/persons/:id', (req, res, next) => {
+    const person = {
+        name: req.body.name,
+        number: req.body.number
+    }
+
+    Person.findByIdAndUpdate(req.params.id, person, { new: true })
+        .then(response => {
+            if (response) {
+                res.json(response)
+            } else {
+                res.status(500).end()
+            }
+        })
+        .catch(error => next(error))
+})
+
+// eliminar un recurso individual
+app.delete('/api/persons/:id', (req, res) => {
+    Person.findByIdAndDelete(req.params.id)
+        .then(response => {
+            res.status(204).end()
+        })
+})
+
+// middleware a ejecutar cuando el endpoint ingresado no puede ser controlado por la aplicacion
+const unknownEndpoints = (req, res, next) => {
+    res.status(404).json({error: 'unknown endpoint'})
+}
+
+// middleware a ejecutar cuando se se captura un error en los controladores de ruta
 const errorHandler = (error, req, res, next) => {
     console.log(error.message)
 
@@ -86,14 +110,10 @@ const errorHandler = (error, req, res, next) => {
     }
 }
 
-const unknownEndpoints = (req, res, next) => {
-    res.status(404).json({error: 'unknown endpoint'})
-}
-
 app.use(unknownEndpoints)
 app.use(errorHandler)
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)

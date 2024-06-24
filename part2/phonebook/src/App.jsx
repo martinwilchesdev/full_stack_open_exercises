@@ -65,6 +65,9 @@ const App = () => {
                                 return p
                             }))
                         })
+                        .catch(error => {
+                            setPersons(persons.filter(p => p.id != existPerson.id))
+                        })
                 }
             } else {
                 setError(false)
@@ -75,7 +78,6 @@ const App = () => {
                 setPerson.create(newObject)
                     .then(data => {
                         setPersons(persons.concat(data))
-                        console.log(persons)
                     })
             }
         }
@@ -96,8 +98,10 @@ const App = () => {
     const handleDeletePerson = (person) => {
         if (window.confirm(`Delete ${person.name} ?`)) {
             setPerson.remove(person)
-                .then(data => {
-                    setPersons(persons.filter(p => p.id != data.id))
+                .then(response => {
+                    if (response.status === 204) {
+                        setPersons(persons.filter(p => p.id != person.id))
+                    }
                 })
                 .catch(error => {
                     setError(true)
