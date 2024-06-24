@@ -34,7 +34,7 @@ app.get('/api/info', (req, res) => {
 })
 
 // obtener un recurso individual
-app.get('/api/persons/:id', (req, res) => {
+app.get('/api/persons/:id', (req, res, next) => {
     Person.findById(req.params.id)
         .then(person => {
             if (person) {
@@ -44,7 +44,7 @@ app.get('/api/persons/:id', (req, res) => {
             }
         })
         .catch(error => {
-            console.log('Error:', error.message)
+            next(error)
         })
 })
 
@@ -58,7 +58,6 @@ app.delete('/api/persons/:id', (req, res) => {
 
 // crear un nuevo recurso
 app.post('/api/persons', (req, res) => {
-    console.log('create new person')
     const body = req.body
     if (!body.name) return res.status(400).send({ error: 'field name cannot be empty' })
     Person.find({ name: body.name })
@@ -78,6 +77,21 @@ app.post('/api/persons', (req, res) => {
             }
         })
 })
+
+const errorHandler = (error, req, res, next) => {
+    console.log(error.message)
+
+    if (error.name === 'CastError') {
+        res.status(400).json({ error: 'malformatted id' })
+    }
+}
+
+const unknownEndpoints = (req, res, next) => {
+    res.status(404).json({error: 'unknown endpoint'})
+}
+
+app.use(unknownEndpoints)
+app.use(errorHandler)
 
 const PORT = process.env.PORT || 3001
 
