@@ -130,7 +130,7 @@ const App = () => {
             setPerson
                 .remove(person)
                 .then((data) => {
-                    setPersons(persons.filter((p) => p.id != data.id))
+                    setPersons(persons.filter((p) => p.id != person.id))
                 })
                 .catch((error) => {
                     setError(true)
