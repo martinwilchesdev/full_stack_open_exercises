@@ -19,11 +19,12 @@ const App = () => {
     const [error, setError] = useState(false)
 
     useEffect(() => {
-        setPerson.getAll()
-            .then(data => {
+        setPerson
+            .getAll()
+            .then((data) => {
                 setPersons(data)
             })
-            .catch(error => {
+            .catch((error) => {
                 console.log(error)
             })
     }, [])
@@ -50,34 +51,63 @@ const App = () => {
                 number: personInfo.number,
             }
 
-            const existPerson = persons.find((person) => person.name === personInfo.name)
+            const existPerson = persons.find(
+                (person) => person.name === personInfo.name
+            )
 
-            if (
-                existPerson !== undefined
-            ) {
-                if (window.confirm(`${personInfo.name} is already added to phonebook, replace the old number with a new one?`)) {
-                    setPerson.update(newObject, existPerson.id)
-                        .then(data => {
-                            setPersons(persons.map(p => {
-                                if (p.id == data.id) {
-                                    return data
-                                }
-                                return p
-                            }))
+            if (existPerson !== undefined) {
+                if (
+                    window.confirm(
+                        `${personInfo.name} is already added to phonebook, replace the old number with a new one?`
+                    )
+                ) {
+                    setPerson
+                        .update(newObject, existPerson.id)
+                        .then((data) => {
+                            setPersons(
+                                persons.map((p) => {
+                                    if (p.id == data.id) {
+                                        return data
+                                    }
+                                    return p
+                                })
+                            )
                         })
-                        .catch(error => {
-                            setPersons(persons.filter(p => p.id != existPerson.id))
+                        .catch((error) => {
+                            if (
+                                error.response.data.name === 'ValidationError'
+                            ) {
+                                setError(true)
+                                setNotificationMessage(
+                                    error.response.data.message
+                                )
+                                setTimeout(
+                                    () => setNotificationMessage(null),
+                                    4000
+                                )
+                            } else {
+                                setPersons(
+                                    persons.filter(
+                                        (p) => p.id != existPerson.id
+                                    )
+                                )
+                            }
                         })
                 }
             } else {
-                setError(false)
-                setNotificationMessage(`Added ${personInfo.name}`)
-                setTimeout(() => {
-                    setNotificationMessage(null)
-                }, 4000)
-                setPerson.create(newObject)
-                    .then(data => {
+                setPerson
+                    .create(newObject)
+                    .then((data) => {
                         setPersons(persons.concat(data))
+
+                        setError(false)
+                        setNotificationMessage(`Added ${personInfo.name}`)
+                        setTimeout(() => setNotificationMessage(null), 4000)
+                    })
+                    .catch((error) => {
+                        setError(true)
+                        setNotificationMessage(error.response.data.message)
+                        setTimeout(() => setNotificationMessage(null), 4000)
                     })
             }
         }
@@ -97,18 +127,17 @@ const App = () => {
 
     const handleDeletePerson = (person) => {
         if (window.confirm(`Delete ${person.name} ?`)) {
-            setPerson.remove(person)
-                .then(response => {
-                    if (response.status === 204) {
-                        setPersons(persons.filter(p => p.id != person.id))
-                    }
+            setPerson
+                .remove(person)
+                .then((data) => {
+                    setPersons(persons.filter((p) => p.id != data.id))
                 })
-                .catch(error => {
+                .catch((error) => {
                     setError(true)
-                    setNotificationMessage(`Information of ${person.name} has already been removed from server`)
-                    setTimeout(() => {
-                        setNotificationMessage(null)
-                    }, 4000)
+                    setNotificationMessage(
+                        `Information of ${person.name} has already been removed from server`
+                    )
+                    setTimeout(() => setNotificationMessage(null), 4000)
                 })
         }
     }
@@ -125,7 +154,10 @@ const App = () => {
                 onHandleSubmitInfo={handleSubmitInfo}
             />
             <h3>Numbers</h3>
-            <Persons persons={name != '' ? filterPersons : persons} onDeletePerson={handleDeletePerson} />
+            <Persons
+                persons={name != '' ? filterPersons : persons}
+                onDeletePerson={handleDeletePerson}
+            />
         </div>
     )
 }

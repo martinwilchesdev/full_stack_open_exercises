@@ -66,6 +66,10 @@ app.post('/api/persons', (req, res, next) => {
                     .then(person => {
                         res.status(201).json(person)
                     })
+                    // .catch(error => {
+                    //     res.status(500).send(error)
+                    // })
+                    .catch(error => next(error))
             }
         })
 })
@@ -77,7 +81,7 @@ app.put('/api/persons/:id', (req, res, next) => {
         number: req.body.number
     }
 
-    Person.findByIdAndUpdate(req.params.id, person, { new: true })
+    Person.findByIdAndUpdate(req.params.id, person, { new: true, runValidators: true })
         .then(response => {
             if (response) {
                 res.json(response)
@@ -103,10 +107,12 @@ const unknownEndpoints = (req, res, next) => {
 
 // middleware a ejecutar cuando se se captura un error en los controladores de ruta
 const errorHandler = (error, req, res, next) => {
-    console.log(error.message)
+    console.log('Error', error.message)
 
     if (error.name === 'CastError') {
         res.status(400).json({ error: 'malformatted id' })
+    } else if (error.name === 'ValidationError') {
+        res.status(400).send(error)
     }
 }
 
