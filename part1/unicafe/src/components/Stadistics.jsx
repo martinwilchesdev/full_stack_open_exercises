@@ -25,7 +25,7 @@ const Stadistics = (props) => {
                 </tr>
                 <tr>
                     <td>
-                        <StadisticsLine text="neutral" stadisticValue={props.neutral} />
+                        <StadisticsLine text="ok" stadisticValue={props.neutral} />
                     </td>
                 </tr>
                 <tr>

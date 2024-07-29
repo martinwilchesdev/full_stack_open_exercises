@@ -1,40 +1,44 @@
+import counterReducer from './store/counter'
+import { createStore } from 'redux'
+
 import Stadistics from './components/Stadistics'
 import Button from './components/Button'
-import { useState } from 'react'
+
+const store = createStore(counterReducer)
 
 const App = () => {
-  // guarda los clics de cada botón en su propio estado
-  const [good, setGood] = useState(0)
-  const [neutral, setNeutral] = useState(0)
-  const [bad, setBad] = useState(0)
-
   const handleGood = () => {
-    setGood(good + 1)
+    store.dispatch({type: 'GOOD'})
   }
 
   const handleNeutral = () => {
-    setNeutral(neutral + 1)
+    store.dispatch({type: 'OK'})
   }
 
   const handleBad = () => {
-    setBad(bad + 1)
+    store.dispatch({type: 'BAD'})
+  }
+
+  const handleReset = () => {
+    store.dispatch({type: 'ZERO'})
   }
 
   return (
     <div>
       <h1>give feedback</h1>
       <div>
+        <Button onHandleStadistic={handleNeutral} text="ok" />
         <Button onHandleStadistic={handleGood} text="good" />
-        <Button onHandleStadistic={handleNeutral} text="neutral" />
         <Button onHandleStadistic={handleBad} text="bad" />
+        <Button onHandleStadistic={handleReset} text="reset stats" />
       </div>
-      <Stadistics 
-        good={good}
-        neutral={neutral}
-        bad={bad}
+      <Stadistics
+        neutral={store.getState().ok}
+        good={store.getState().good}
+        bad={store.getState().bad}
       />
     </div>
   )
 }
 
-export default App
+export default { App, store }

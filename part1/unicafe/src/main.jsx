@@ -1,4 +1,12 @@
 import ReactDOM from 'react-dom/client'
-import App from './App.jsx'
+import appComponent from './App.jsx'
 
-ReactDOM.createRoot(document.getElementById('root')).render(<App />)
+const root = ReactDOM.createRoot(document.getElementById('root'))
+const renderApp = () => {
+    root.render(<appComponent.App />)
+}
+
+renderApp()
+
+const store = appComponent.store
+store.subscribe(renderApp)
