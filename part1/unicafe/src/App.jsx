@@ -1,10 +1,6 @@
-import counterReducer from './store/counter'
-import { createStore } from 'redux'
-
 import Stadistics from './components/Stadistics'
 import Button from './components/Button'
-
-const store = createStore(counterReducer)
+import store from './store/counter'
 
 const App = () => {
   const handleGood = () => {
@@ -41,4 +37,4 @@ const App = () => {
   )
 }
 
-export default { App, store }
+export default App
